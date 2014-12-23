@@ -51,11 +51,13 @@ public class MBArticle implements Serializable {
     private List<Article> tempAchat = new ArrayList<Article>();
     private Double netApayez = 0.0;    
     private String codebarre = "";
+    private Integer idcategorie;
 
     @PostConstruct
     public void init() {
         try {
-            parserXML();
+            
+            parserXML("http://localhost:8080/CaisseApplication-war/webresources/listearticle", "GET");
             lstArticle.clear();
             lstArticle = ArticleHandler.getListArctile();
         } catch (Exception ex) {
@@ -89,9 +91,9 @@ public class MBArticle implements Serializable {
         return sb.toString();
     }
 
-    public void parserXML() throws Exception {
+    public void parserXML(String url, String method) throws Exception {
 
-        String str = listerArticle("http://localhost:8080/CaisseApplication-war/webresources/listearticle", "GET");
+        String str = listerArticle(url, method);
 
         stringToDom(str);
     }
@@ -164,6 +166,17 @@ public class MBArticle implements Serializable {
 
     }
     
+    public void obtenireParCategorie(){
+        try {
+            parserXML("http://localhost:8080/CaisseApplication-war/webresources/listearticle/obtenirArticleByCategorie/"+idcategorie.toString(), "POST");
+            lstArticle.clear();
+            lstArticle = ArticleHandler.getListArctile();
+           
+        } catch (Exception ex) {
+            Logger.getLogger(MBArticle.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
 
     /**
      * @return the lstArticle
@@ -233,6 +246,20 @@ public class MBArticle implements Serializable {
      */
     public void setNetApayez(Double netApayez) {
         this.netApayez = netApayez;
+    }
+
+    /**
+     * @return the idcategorie
+     */
+    public Integer getIdcategorie() {
+        return idcategorie;
+    }
+
+    /**
+     * @param idcategorie the idcategorie to set
+     */
+    public void setIdcategorie(Integer idcategorie) {
+        this.idcategorie = idcategorie;
     }
 
 }

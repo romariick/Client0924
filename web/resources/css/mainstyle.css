@@ -303,8 +303,14 @@ h2 {
 .boldLabel{
     font-weight: bold;
     text-align: left;
+    
 }
-
+.netapayez{
+    font-weight: bold;
+    text-align: left;
+    color: black;
+    font-size: 24px;
+}
 .order-table-header{
     text-align:center;
     background:none repeat scroll 0 0 #E5E5E5;

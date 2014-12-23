@@ -5,6 +5,7 @@
  */
 package com.parseur;
 
+import com.metier.Categorie;
 import com.metier.Utilisateur;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,30 +17,46 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Romaric
  */
-public class UtilisateurHandler extends DefaultHandler {
+public class CategorieHandler extends DefaultHandler {
 
     /**
-     * @return the listUtilisateur
+     * @return the listCategorie
      */
-    public static List<Utilisateur> getListUtilisateur() {
-        return listUtilisateur;
+    public static List<Categorie> getListCategorie() {
+        return listCategorie;
     }
 
     /**
-     * @param aListUtilisateur the listUtilisateur to set
+     * @param aListCategorie the listCategorie to set
      */
-    public static void setListUtilisateur(List<Utilisateur> aListUtilisateur) {
-        listUtilisateur = aListUtilisateur;
+    public static void setListCategorie(List<Categorie> aListCategorie) {
+        listCategorie = aListCategorie;
     }
+
+    /**
+     * @return the ajoutCategorie
+     */
+    public static Categorie getAjoutCategorie() {
+        return ajoutCategorie;
+    }
+
+    /**
+     * @param aAjoutCategorie the ajoutCategorie to set
+     */
+    public static void setAjoutCategorie(Categorie aAjoutCategorie) {
+        ajoutCategorie = aAjoutCategorie;
+    }
+
+  
 
     private StringBuffer buffer;
-    private static List<Utilisateur> listUtilisateur = new ArrayList<Utilisateur>();
-    private static  Utilisateur ajoutUtilisateur = new Utilisateur();
+    private static List<Categorie> listCategorie = new ArrayList<Categorie>();
+    private static  Categorie ajoutCategorie = new Categorie();
 
     /**
      * Constructeur par defaut. Initialise le buffer.
      */
-    public UtilisateurHandler() {
+    public CategorieHandler() {
         super();
         buffer = new StringBuffer();
     }
@@ -87,17 +104,18 @@ public class UtilisateurHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-        if (qName.equals("utilisateurs")) {
+        if (qName.equals("categories")) {
             System.out.println("Debut utilisateur");
-            ajoutUtilisateur = new Utilisateur();
+            setAjoutCategorie(new Categorie());
 
-        } else if (qName.equals("nom")) {
+        } else if (qName.equals("libellecategorie")) {
             buffer = new StringBuffer();
-        } else if(qName.equals("prenom")) {
-            buffer = new StringBuffer();           
-        }else if(qName.equals("login")){
-            buffer = new StringBuffer(); 
-        }else{
+        } else if(qName.equals("descriptioncategorie")) {
+            buffer = new StringBuffer();
+        }else if(qName.equals("idcategorie")){
+            buffer = new StringBuffer();
+        }
+        else{
             buffer = null;
         }
     }
@@ -112,41 +130,29 @@ public class UtilisateurHandler extends DefaultHandler {
      */
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (qName.equals("utilisateurs")) {
-            listUtilisateur.add(ajoutUtilisateur);
+        if (qName.equals("categories")) {
+            listCategorie.add(getAjoutCategorie());
             //ajoutArticle = new Article();
         }
-        if (qName.equals("nom")) {
-            ajoutUtilisateur.setNom(buffer.toString());
+        if (qName.equals("libellecategorie")) {
+            getAjoutCategorie().setLibelle(buffer.toString());
             buffer = null;
         }else
-        if (qName.equals("prenom")) {
-            ajoutUtilisateur.setPrenom(buffer.toString());
+        if (qName.equals("descriptioncategorie")) {
+            getAjoutCategorie().setDescription(buffer.toString());
             buffer = null;
         }else
-        if (qName.equals("login")) {
-            ajoutUtilisateur.setLogin(buffer.toString());
-            buffer = null;
+            if(qName.equals("idcategorie")){
+                String temp = buffer.toString();
+                ajoutCategorie.setIdcategorie(Integer.parseInt(temp));
+                            buffer = null;
 
-        }
+            }
 
         //ajoutArticle.setListeArticle(getListArctile());
     }
 
-    /**
-     * @return the ajoutUtilisateur
-     */
-    public static Utilisateur getAjoutUtilisateur() {
-        return ajoutUtilisateur;
-    }
-
-    /**
-     * @param ajoutUtilisateur the ajoutUtilisateur to set
-     */
-    public static void setAjoutUtilisateur(Utilisateur ajoutUtilisateur) {
-        ajoutUtilisateur = ajoutUtilisateur;
-    }
-
+  
   
 
 }
