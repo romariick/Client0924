@@ -37,6 +37,7 @@ public class ArticleHandler extends DefaultHandler {
      */
     @Override
     public void startDocument() throws SAXException {
+        listArctile.clear();
         System.out.println("Debut de l'analyse" + System.getProperty("line.separator"));
     }
 

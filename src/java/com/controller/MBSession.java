@@ -6,7 +6,6 @@
 package com.controller;
 
 import com.metier.Utilisateur;
-import com.parseur.ArticleHandler;
 import com.parseur.UtilisateurHandler;
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,11 +17,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -54,9 +54,7 @@ public class MBSession implements Serializable {
     public String sauthentifier() throws IOException, ParserConfigurationException, SAXException, TransformerException {
         String url = "http://localhost:8080/CaisseApplication-war/webresources/listeUtilisateur/obtenirUtilisateurByMotdepasse/"+login+"-"+motdepasse;
         String ret = "";
-        
         String retxml = envoyerEtRecevoirXml(url, "POST");
-
         if (!retxml.isEmpty()) {
             stringToDom(retxml);
             recuperUtilisateur = UtilisateurHandler.getAjoutUtilisateur();
@@ -128,9 +126,11 @@ public class MBSession implements Serializable {
         } catch (IOException e) {
             System.err.println("Probleme d'entrée/sortie : " + e);
         }
-
     }
-
+  public String deconnexion() {
+      
+        return "authentification";
+    }
     /**
      * @return the login
      */

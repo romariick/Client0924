@@ -18,6 +18,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -45,10 +47,20 @@ import org.xml.sax.helpers.DefaultHandler;
 public class MBArticle implements Serializable {
 
     public List<Article> lstArticle = new ArrayList<Article>();
+    private List<Article> lstAchat = new ArrayList<Article>();
+    private List<Article> tempAchat = new ArrayList<Article>();
+    private Double netApayez = 0.0;    
+    private String codebarre = "";
 
     @PostConstruct
     public void init() {
-        lstArticle = ArticleHandler.getListArctile();
+        try {
+            parserXML();
+            lstArticle.clear();
+            lstArticle = ArticleHandler.getListArctile();
+        } catch (Exception ex) {
+            Logger.getLogger(MBArticle.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public String listerArticle(String adresseUrl, String methodeHTTP) throws MalformedURLException, IOException {
@@ -122,6 +134,37 @@ public class MBArticle implements Serializable {
 
     }
 
+    public void acheterProduit() throws IOException, ParserConfigurationException, SAXException, TransformerException {
+        String str = listerArticle("http://localhost:8080/CaisseApplication-war/webresources/listearticle/obtenirArticleByCodeBarre/" + codebarre, "POST");
+
+        if (!str.isEmpty()) {
+            stringToDom(str);
+            if (!codebarre.isEmpty()) {
+                String acheter = listerArticle("http://localhost:8080/CaisseApplication-war/webresources/listearticle/acheterArticleByCodeBarre/" + codebarre, "POST");
+                if (acheter.equals("achatok")) {   
+                    lstAchat = ArticleHandler.getListArctile();
+                    Double sommeTotal = 0.0;
+                    Double calcul;
+                    
+                    Article sauvarticle = new Article();
+                    
+                    sauvarticle.setCodeBarre(lstAchat.get(0).getCodeBarre());
+                    sauvarticle.setPrix(lstAchat.get(0).getPrix());
+                    sauvarticle.setNomproduit(lstAchat.get(0).getNomproduit());
+                    sauvarticle.setDisponibilite(lstAchat.get(0).getDisponibilite());
+                    sauvarticle.setReduction(lstAchat.get(0).getReduction());                   
+                    
+                    netApayez +=  Double.parseDouble(lstAchat.get(0).getPrix());
+                    tempAchat.add(sauvarticle);
+                    
+                    
+                }           
+            }
+        }
+
+    }
+    
+
     /**
      * @return the lstArticle
      */
@@ -134,6 +177,62 @@ public class MBArticle implements Serializable {
      */
     public void setLstArticle(List<Article> lstArticle) {
         this.lstArticle = lstArticle;
+    }
+
+    /**
+     * @return the codebarre
+     */
+    public String getCodebarre() {
+        return codebarre;
+    }
+
+    /**
+     * @param codebarre the codebarre to set
+     */
+    public void setCodebarre(String codebarre) {
+        this.codebarre = codebarre;
+    }
+
+    /**
+     * @return the lstAchat
+     */
+    public List<Article> getLstAchat() {
+        return lstAchat;
+    }
+
+    /**
+     * @param lstAchat the lstAchat to set
+     */
+    public void setLstAchat(List<Article> lstAchat) {
+        this.lstAchat = lstAchat;
+    }
+
+    /**
+     * @return the tempAchat
+     */
+    public List<Article> getTempAchat() {
+        return tempAchat;
+    }
+
+    /**
+     * @param tempAchat the tempAchat to set
+     */
+    public void setTempAchat(List<Article> tempAchat) {
+        this.tempAchat = tempAchat;
+    }
+
+    /**
+     * @return the netApayez
+     */
+    public Double getNetApayez() {
+        return netApayez;
+    }
+
+    /**
+     * @param netApayez the netApayez to set
+     */
+    public void setNetApayez(Double netApayez) {
+        this.netApayez = netApayez;
     }
 
 }
