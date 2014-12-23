@@ -49,14 +49,14 @@ public class MBArticle implements Serializable {
     public List<Article> lstArticle = new ArrayList<Article>();
     private List<Article> lstAchat = new ArrayList<Article>();
     private List<Article> tempAchat = new ArrayList<Article>();
-    private Double netApayez = 0.0;    
+    private Double netApayez = 0.0;
     private String codebarre = "";
     private Integer idcategorie;
 
     @PostConstruct
     public void init() {
         try {
-            
+
             parserXML("http://localhost:8080/CaisseApplication-war/webresources/listearticle", "GET");
             lstArticle.clear();
             lstArticle = ArticleHandler.getListArctile();
@@ -98,15 +98,27 @@ public class MBArticle implements Serializable {
         stringToDom(str);
     }
 
+    public void parserXMLParCategorie(String url, String method) throws IOException, ParserConfigurationException, SAXException, TransformerException {
+        String str = listerArticle(url, method);
+        String textXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
+                + "<article> ";
+        String baliseFermante = "</article>";
+
+        String res = textXML.concat(str).concat(baliseFermante);
+        stringToDom(res);
+    }
+
     void stringToDom(String xmlSource) throws ParserConfigurationException, SAXException, IOException, TransformerConfigurationException, TransformerException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
+
         org.w3c.dom.Document doc = builder.parse(new InputSource(new StringReader(xmlSource)));
         // Use a Transformer for output
         TransformerFactory tFactory = TransformerFactory.newInstance();
         javax.xml.transform.Transformer transformer = tFactory.newTransformer();
 
         DOMSource source = new DOMSource(doc);
+
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         StreamResult result = new StreamResult(new File("G:\\test.xml"));
         transformer.transform(source, result);
@@ -143,40 +155,40 @@ public class MBArticle implements Serializable {
             stringToDom(str);
             if (!codebarre.isEmpty()) {
                 String acheter = listerArticle("http://localhost:8080/CaisseApplication-war/webresources/listearticle/acheterArticleByCodeBarre/" + codebarre, "POST");
-                if (acheter.equals("achatok")) {   
+                if (acheter.equals("achatok")) {
                     lstAchat = ArticleHandler.getListArctile();
                     Double sommeTotal = 0.0;
                     Double calcul;
-                    
+
                     Article sauvarticle = new Article();
-                    
+
                     sauvarticle.setCodeBarre(lstAchat.get(0).getCodeBarre());
                     sauvarticle.setPrix(lstAchat.get(0).getPrix());
                     sauvarticle.setNomproduit(lstAchat.get(0).getNomproduit());
                     sauvarticle.setDisponibilite(lstAchat.get(0).getDisponibilite());
-                    sauvarticle.setReduction(lstAchat.get(0).getReduction());                   
-                    
-                    netApayez +=  Double.parseDouble(lstAchat.get(0).getPrix());
+                    sauvarticle.setReduction(lstAchat.get(0).getReduction());
+
+                    netApayez += Double.parseDouble(lstAchat.get(0).getPrix());
                     tempAchat.add(sauvarticle);
-                    
-                    
-                }           
+
+                }
             }
         }
 
     }
-    
-    public void obtenireParCategorie(){
+
+    public void obtenireParCategorie() {
         try {
-            parserXML("http://localhost:8080/CaisseApplication-war/webresources/listearticle/obtenirArticleByCategorie/"+idcategorie.toString(), "POST");
-            lstArticle.clear();
-            lstArticle = ArticleHandler.getListArctile();
-           
+            parserXMLParCategorie("http://localhost:8080/CaisseApplication-war/webresources/listearticle/obtenirArticleByCategorie/" + idcategorie.toString(), "POST");
+//            lstArticle.clear();
+//            lstArticle = new ArrayList<Article>();
+//            lstArticle = ArticleHandler.getListArctile();
+//            ArticleHandler.getListArctile();
+
         } catch (Exception ex) {
             Logger.getLogger(MBArticle.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
 
     /**
      * @return the lstArticle

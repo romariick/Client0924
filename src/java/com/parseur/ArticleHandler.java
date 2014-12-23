@@ -20,6 +20,21 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ArticleHandler extends DefaultHandler {
 
+        /**
+     * @return the listArctile
+     */
+    public static List<Article> getListArctile() {
+        return listArctile;
+    }
+
+    /**
+     * @param aListArctile the listArctile to set
+     */
+    public static void setListArctile(List<Article> aListArctile) {
+        listArctile = aListArctile;
+    }
+
+    
     private StringBuffer buffer;
     private static List<Article> listArctile = new ArrayList<Article>();
     private Article ajoutArticle = new Article();
@@ -144,17 +159,4 @@ public class ArticleHandler extends DefaultHandler {
         this.ajoutArticle = ajoutArticle;
     }
 
-    /**
-     * @return the listArctile
-     */
-    public static List<Article> getListArctile() {
-        return listArctile;
-    }
-
-    /**
-     * @param aListArctile the listArctile to set
-     */
-    public static void setListArctile(List<Article> aListArctile) {
-        listArctile = aListArctile;
-    }
 }
