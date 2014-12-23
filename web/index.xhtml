@@ -7,7 +7,7 @@
 
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <title>Administration logistique</title>
+        <title>Client caisse.</title>
     </h:head>
     <h:body class="accueil">
         <h:outputStylesheet library="css" name="styles.css"  />
@@ -32,9 +32,15 @@
                             <h:panelGrid columns="1"  cellpadding="5"  id="acceuilConnexion" styleClass="tableNoBorder" style="border-left: 0px;" >
 
 
-                                
-                                
-                                <p:commandButton  styleClass="alignerRight" icon="ui-icon-key" value="Connecter" ajax="false" action="#{MBArticle.listerArticle()}"
+                                <h:outputText value="Login :" style="font-size: 14px !important;"/>
+                                <p:inputText requiredMessage="Saisie de login obligatoire." id="utilisateur" value="#{MBSession.login}"   required="true" label="Login utilisateur" style="width:280px; height: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);"  />  
+
+                                <h:outputText value="Mot de passe : " style="font-size: 14px !important;"/>
+                                <p:password  id="password" requiredMessage="Saisie de mot de passe obligatoire." value="#{MBSession.motdepasse}"   required="true" label="Mot de passe" style="width:280px; height: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);"/>  
+
+
+                                <h:outputText value=""/>
+                                <p:commandButton  styleClass="alignerRight" icon="ui-icon-key" value="Connecter" ajax="false" action="#{MBSession.sauthentifier}"
                                                   />
                             </h:panelGrid>
                         </div>

@@ -5,8 +5,9 @@
  */
 package com.controller;
 
-import com.metier.Article;
+import com.metier.Utilisateur;
 import com.parseur.ArticleHandler;
+import com.parseur.UtilisateurHandler;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -18,9 +19,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,18 +42,32 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author Romaric
  */
-@ViewScoped
-@ManagedBean(name = "MBArticle")
-public class MBArticle implements Serializable {
+@SessionScoped
+@ManagedBean(name = "MBSession")
+public class MBSession implements Serializable {
 
-    public List<Article> lstArticle = new ArrayList<Article>();
+    private String login;
+    private String motdepasse;
+    private List<Utilisateur> lstUtilisateur = new ArrayList<Utilisateur>();
+    private Utilisateur recuperUtilisateur = new Utilisateur();
 
-    @PostConstruct
-    public void init() {
-        lstArticle = ArticleHandler.getListArctile();
+    public String sauthentifier() throws IOException, ParserConfigurationException, SAXException, TransformerException {
+        String url = "http://localhost:8080/CaisseApplication-war/webresources/listeUtilisateur/obtenirUtilisateurByMotdepasse/"+login+"-"+motdepasse;
+        String ret = "";
+        
+        String retxml = envoyerEtRecevoirXml(url, "POST");
+
+        if (!retxml.isEmpty()) {
+            stringToDom(retxml);
+            recuperUtilisateur = UtilisateurHandler.getAjoutUtilisateur();
+            ret = "succes";
+        } else {
+            ret = "authentification";
+        }
+        return ret;
     }
 
-    public String listerArticle(String adresseUrl, String methodeHTTP) throws MalformedURLException, IOException {
+    public String envoyerEtRecevoirXml(String adresseUrl, String methodeHTTP) throws MalformedURLException, IOException {
 
         URL url = new URL(adresseUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -77,13 +93,6 @@ public class MBArticle implements Serializable {
         return sb.toString();
     }
 
-    public void parserXML() throws Exception {
-
-        String str = listerArticle("http://localhost:8080/CaisseApplication-war/webresources/listearticle", "GET");
-
-        stringToDom(str);
-    }
-
     void stringToDom(String xmlSource) throws ParserConfigurationException, SAXException, IOException, TransformerConfigurationException, TransformerException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -94,10 +103,10 @@ public class MBArticle implements Serializable {
 
         DOMSource source = new DOMSource(doc);
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        StreamResult result = new StreamResult(new File("G:\\test.xml"));
+        StreamResult result = new StreamResult(new File("G:\\Utilisateur.xml"));
         transformer.transform(source, result);
 
-        parserXMLFichier("G:\\test.xml");
+        parserXMLFichier("G:\\Utilisateur.xml");
     }
 
     public void parserXMLFichier(String nomFichier) {
@@ -110,7 +119,7 @@ public class MBArticle implements Serializable {
 
             // lecture d'un fichier XML avec un DefaultHandler
             File fichier = new File(nomFichier);
-            DefaultHandler gestionnaire = new ArticleHandler();
+            DefaultHandler gestionnaire = new UtilisateurHandler();
             parseur.parse(fichier, gestionnaire);
         } catch (ParserConfigurationException e) {
             System.err.println("Probleme lors de la creation du parser : " + e);
@@ -123,17 +132,59 @@ public class MBArticle implements Serializable {
     }
 
     /**
-     * @return the lstArticle
+     * @return the login
      */
-    public List<Article> getLstArticle() {
-        return lstArticle;
+    public String getLogin() {
+        return login;
     }
 
     /**
-     * @param lstArticle the lstArticle to set
+     * @param login the login to set
      */
-    public void setLstArticle(List<Article> lstArticle) {
-        this.lstArticle = lstArticle;
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    /**
+     * @return the motdepasse
+     */
+    public String getMotdepasse() {
+        return motdepasse;
+    }
+
+    /**
+     * @param motdepasse the motdepasse to set
+     */
+    public void setMotdepasse(String motdepasse) {
+        this.motdepasse = motdepasse;
+    }
+
+    /**
+     * @return the lstUtilisateur
+     */
+    public List<Utilisateur> getLstUtilisateur() {
+        return lstUtilisateur;
+    }
+
+    /**
+     * @param lstUtilisateur the lstUtilisateur to set
+     */
+    public void setLstUtilisateur(List<Utilisateur> lstUtilisateur) {
+        this.lstUtilisateur = lstUtilisateur;
+    }
+
+    /**
+     * @return the recuperUtilisateur
+     */
+    public Utilisateur getRecuperUtilisateur() {
+        return recuperUtilisateur;
+    }
+
+    /**
+     * @param recuperUtilisateur the recuperUtilisateur to set
+     */
+    public void setRecuperUtilisateur(Utilisateur recuperUtilisateur) {
+        this.recuperUtilisateur = recuperUtilisateur;
     }
 
 }
