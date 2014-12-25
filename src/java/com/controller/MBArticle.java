@@ -9,16 +9,23 @@ import com.metier.Article;
 import com.parseur.ArticleHandler;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -36,6 +43,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -66,11 +80,13 @@ public class MBArticle implements Serializable {
     private List<Article> lstAchat = new ArrayList<Article>();
     private List<Article> tempAchat = new ArrayList<Article>();
     private static List<Article> sauvegardeAchatNonPayez = new ArrayList<Article>();
-    private  Double netApayez = 0.0;
-    private static Double sauvegardeNonPayez = 0.0; 
+    private Double netApayez = 0.0;
+    private static Double sauvegardeNonPayez = 0.0;
     private String codebarre = "";
     private Integer idcategorie;
     private boolean recupSelectionner;
+    JasperPrint jasperPrint;
+    private String fileNameTemp;
 
     @PostConstruct
     public void init() {
@@ -79,7 +95,7 @@ public class MBArticle implements Serializable {
             parserXML("http://localhost:8080/CaisseApplication-war/webresources/listearticle", "GET");
             lstArticle.clear();
             lstArticle = ArticleHandler.getListArctile();
-            if(!sauvegardeAchatNonPayez.isEmpty()){
+            if (!sauvegardeAchatNonPayez.isEmpty()) {
                 tempAchat = sauvegardeAchatNonPayez;
                 netApayez = sauvegardeNonPayez;
             }
@@ -191,7 +207,7 @@ public class MBArticle implements Serializable {
 
                     netApayez += Double.parseDouble(lstAchat.get(0).getPrix());
                     tempAchat.add(sauvarticle);
-                    
+
                     sauvegardeAchatNonPayez = tempAchat;
                     sauvegardeNonPayez = netApayez;
                     int debug = 0;
@@ -218,9 +234,9 @@ public class MBArticle implements Serializable {
     public void recupererListeProduitSelectionner() throws IOException, ParserConfigurationException, SAXException, TransformerException {
         Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
         String codebarre = params.get("codebarre");
-         
+
         String str = listerArticle("http://localhost:8080/CaisseApplication-war/webresources/listearticle/obtenirArticleByCodeBarre/" + codebarre, "POST");
-        
+
         if (!str.isEmpty()) {
             stringToDom(str);
 //            List<Article> tempList = new ArrayList<Article>();
@@ -237,11 +253,74 @@ public class MBArticle implements Serializable {
 //        
     }
 
-    public void validerAchat(){
+    public void validerAchat() throws JRException, FileNotFoundException {
+        initialisationDetailPDF();
         sauvegardeAchatNonPayez.clear();
         sauvegardeNonPayez = 0.0;
         netApayez = 0.0;
+        
+        
     }
+
+    public void initialisationDetailPDF() throws JRException, FileNotFoundException {
+        fileNameTemp = "facture.pdf";
+ 
+        try {
+            String destFiles = FacesContext.getCurrentInstance().getExternalContext().getRealPath("admin/");
+            File pdfFile = new File(destFiles + "/Fichier.pdf");
+            copyFile(fileNameTemp, new FileInputStream(pdfFile), destFiles);
+            String destFileTemp = FacesContext.getCurrentInstance().getExternalContext().getRealPath("admin/" + fileNameTemp);
+            File pdfFileTemp = new File(destFileTemp);
+            System.out.println("Exist" + pdfFileTemp.exists());
+        } catch (Exception e) {
+        }
+
+        HashMap mesParametres = new HashMap();
+        
+        mesParametres.put("totalEuro", netApayez);
+       
+
+        List<Article> temps = null;
+        JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(tempAchat);
+        String reportPath = FacesContext.getCurrentInstance().getExternalContext().getRealPath("reports/factureticket.jasper");
+
+        String destFileTemp = FacesContext.getCurrentInstance().getExternalContext().getRealPath("/admin/" + fileNameTemp);
+        File pdfFileTemp = new File(destFileTemp);
+
+        jasperPrint = JasperFillManager.fillReport(reportPath, mesParametres, beanCollectionDataSource);
+
+        JRPdfExporter exp = new JRPdfExporter();
+
+        exp.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+        exp.setParameter(JRExporterParameter.OUTPUT_STREAM, new FileOutputStream(pdfFileTemp));
+
+        exp.exportReport();
+    }
+
+    public void copyFile(String fileName, InputStream in, String destination) {
+
+        try {
+
+            // write the inputStream to a FileOutputStream
+            OutputStream out = new FileOutputStream(new File(destination + "/" + fileName));
+
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            while ((read = in.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+
+            in.close();
+            out.flush();
+            out.close();
+
+            System.out.println("New file created!");
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     /**
      * @return the lstArticle
      */
@@ -336,7 +415,7 @@ public class MBArticle implements Serializable {
     /**
      * @param recupSelectionner the recupSelectionner to set
      */
-    public  void setRecupSelectionner(boolean recupSelectionner) {
+    public void setRecupSelectionner(boolean recupSelectionner) {
         this.recupSelectionner = recupSelectionner;
     }
 
@@ -352,6 +431,20 @@ public class MBArticle implements Serializable {
      */
     public static void setSauvegardeAchatNonPayez(List<Article> sauvegardeAchatNonPayez) {
         sauvegardeAchatNonPayez = sauvegardeAchatNonPayez;
+    }
+
+    /**
+     * @return the fileNameTemp
+     */
+    public String getFileNameTemp() {
+        return fileNameTemp;
+    }
+
+    /**
+     * @param fileNameTemp the fileNameTemp to set
+     */
+    public void setFileNameTemp(String fileNameTemp) {
+        this.fileNameTemp = fileNameTemp;
     }
 
 }

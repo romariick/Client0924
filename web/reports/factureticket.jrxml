@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b183ebf9-f5b3-44c4-bf3a-0b31a979eae6">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="totalEuro" class="java.lang.Double"/>
+	<field name="nomproduit" class="java.lang.String"/>
+	<field name="prix" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="37" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="6322e932-e5ec-4d0d-9869-d7f1d92b3edd" x="99" y="2" width="375" height="35"/>
+				<textElement textAlignment="Center">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Facture ]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="22">
+			<rectangle>
+				<reportElement uuid="b2626795-39a8-41ea-a227-6984191c55ac" x="99" y="0" width="182" height="22" backcolor="#666666"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="870e36c1-8fa1-4818-b780-c181fa9f67e7" x="99" y="2" width="182" height="20" backcolor="#999999"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Produit]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement uuid="eec3c670-79c0-451a-9770-73ec284445aa" x="281" y="0" width="193" height="22" backcolor="#666666"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="cd362976-7fa4-49ca-9f9e-a506ca2d5d19" x="281" y="2" width="193" height="20" backcolor="#CCCCCC"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prix]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement uuid="d7529954-4f4a-42c2-bdd7-f31ceb11b021" x="281" y="1" width="193" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{prix}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f396a7be-1c93-4f03-99d9-6f9c745b4600" x="99" y="1" width="182" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{nomproduit}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="50">
+			<staticText>
+				<reportElement uuid="943a9d45-3dfe-419c-a0fb-40b1ac049d7e" x="356" y="30" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total EURO :]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="1392c1d3-9d66-4a4a-9082-720f8eaadcf3" x="456" y="30" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$P{totalEuro}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

@@ -59,7 +59,8 @@
                 
                 <p:commandButton icon="ui-icon-plus"   
                                  value="Validez" 
-                                 update=":client, :validationachat:sommeachat"
+                                 oncomplete ="dlgaffichFacture.show();"
+                                 update=":client, :validationachat:sommeachat, :affPdfacture"
                                  actionListener="#{MBArticle.validerAchat()}"
                                  id="ajoutLink" 
                                  
@@ -72,6 +73,13 @@
                 <p:outputLabel styleClass="netapayez"  id="sommeachat" style="float: right;"  value="Somme à Payez : #{MBArticle.netApayez} "/>
             </h:form>
         </p:panel>
+         <h:form id="affPdfacture">
+            <p:dialog id="dialogaffichagefacture" header="Facture n°" widgetVar="dlgaffichFacture" width="800" height="600" modal="true">
+                <p:media value="/admin/#{MBArticle.fileNameTemp}" player="pdf"
+                         id="idmediaDefunt" width="700px" height="600" />
+
+            </p:dialog>
+        </h:form>
     </ui:composition>
 </html>
 
