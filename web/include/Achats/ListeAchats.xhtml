@@ -54,17 +54,22 @@
             </p:dataTable>            
         </h:form>
 
-        <p:panel style="width: 100%; margin-top: 5px;" styleClass="tableNoBorder" >
+        <p:panel style="width: 100%; margin-top: 5px;" id="validationdesachats" styleClass="tableNoBorder" >
             <h:form id="validationachat" style="text-align: left">
+                
                 <p:commandButton icon="ui-icon-plus"   
                                  value="Validez" 
+                                 update=":client, :validationachat:sommeachat"
+                                 actionListener="#{MBArticle.validerAchat()}"
                                  id="ajoutLink" 
+                                 
                                  title="Validez achat" 
                                  style="margin-top: 10px;margin-bottom: 10px;"
                                  >
+                
                 </p:commandButton>
                 
-                <p:outputLabel styleClass="netapayez"  style="float: right;"  value="Somme à Payez : #{MBArticle.netApayez} "/>
+                <p:outputLabel styleClass="netapayez"  id="sommeachat" style="float: right;"  value="Somme à Payez : #{MBArticle.netApayez} "/>
             </h:form>
         </p:panel>
     </ui:composition>

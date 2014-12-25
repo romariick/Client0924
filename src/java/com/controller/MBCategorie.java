@@ -6,7 +6,6 @@
 package com.controller;
 
 import com.metier.Categorie;
-import com.parseur.ArticleHandler;
 import com.parseur.CategorieHandler;
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,6 +53,7 @@ public class MBCategorie implements Serializable {
 
         try {
             parserXML();
+            lstCategorie.clear();
             lstCategorie = CategorieHandler.getListCategorie();
         } catch (Exception ex) {
             Logger.getLogger(MBCategorie.class.getName()).log(Level.SEVERE, null, ex);

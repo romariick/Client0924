@@ -18,11 +18,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -46,12 +48,29 @@ import org.xml.sax.helpers.DefaultHandler;
 @ManagedBean(name = "MBArticle")
 public class MBArticle implements Serializable {
 
+    /**
+     * @return the sauvegardeNonPayez
+     */
+    public static Double getSauvegardeNonPayez() {
+        return sauvegardeNonPayez;
+    }
+
+    /**
+     * @param aSauvegardeNonPayez the sauvegardeNonPayez to set
+     */
+    public static void setSauvegardeNonPayez(Double aSauvegardeNonPayez) {
+        sauvegardeNonPayez = aSauvegardeNonPayez;
+    }
+
     public List<Article> lstArticle = new ArrayList<Article>();
     private List<Article> lstAchat = new ArrayList<Article>();
     private List<Article> tempAchat = new ArrayList<Article>();
-    private Double netApayez = 0.0;
+    private static List<Article> sauvegardeAchatNonPayez = new ArrayList<Article>();
+    private  Double netApayez = 0.0;
+    private static Double sauvegardeNonPayez = 0.0; 
     private String codebarre = "";
     private Integer idcategorie;
+    private boolean recupSelectionner;
 
     @PostConstruct
     public void init() {
@@ -60,6 +79,10 @@ public class MBArticle implements Serializable {
             parserXML("http://localhost:8080/CaisseApplication-war/webresources/listearticle", "GET");
             lstArticle.clear();
             lstArticle = ArticleHandler.getListArctile();
+            if(!sauvegardeAchatNonPayez.isEmpty()){
+                tempAchat = sauvegardeAchatNonPayez;
+                netApayez = sauvegardeNonPayez;
+            }
         } catch (Exception ex) {
             Logger.getLogger(MBArticle.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -157,8 +180,6 @@ public class MBArticle implements Serializable {
                 String acheter = listerArticle("http://localhost:8080/CaisseApplication-war/webresources/listearticle/acheterArticleByCodeBarre/" + codebarre, "POST");
                 if (acheter.equals("achatok")) {
                     lstAchat = ArticleHandler.getListArctile();
-                    Double sommeTotal = 0.0;
-                    Double calcul;
 
                     Article sauvarticle = new Article();
 
@@ -170,6 +191,10 @@ public class MBArticle implements Serializable {
 
                     netApayez += Double.parseDouble(lstAchat.get(0).getPrix());
                     tempAchat.add(sauvarticle);
+                    
+                    sauvegardeAchatNonPayez = tempAchat;
+                    sauvegardeNonPayez = netApayez;
+                    int debug = 0;
 
                 }
             }
@@ -190,6 +215,33 @@ public class MBArticle implements Serializable {
         }
     }
 
+    public void recupererListeProduitSelectionner() throws IOException, ParserConfigurationException, SAXException, TransformerException {
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        String codebarre = params.get("codebarre");
+         
+        String str = listerArticle("http://localhost:8080/CaisseApplication-war/webresources/listearticle/obtenirArticleByCodeBarre/" + codebarre, "POST");
+        
+        if (!str.isEmpty()) {
+            stringToDom(str);
+//            List<Article> tempList = new ArrayList<Article>();
+//            tempList = ArticleHandler.getListArctile();
+            //int debug = 0;
+        }
+//        for(Article recupArticleAcheter : lstArticle){
+//            if(recupArticleAcheter.getSelectProduit()){
+//                System.out.println("True");        
+//            }else{
+//                System.out.println("False");
+//            }
+//        }
+//        
+    }
+
+    public void validerAchat(){
+        sauvegardeAchatNonPayez.clear();
+        sauvegardeNonPayez = 0.0;
+        netApayez = 0.0;
+    }
     /**
      * @return the lstArticle
      */
@@ -272,6 +324,34 @@ public class MBArticle implements Serializable {
      */
     public void setIdcategorie(Integer idcategorie) {
         this.idcategorie = idcategorie;
+    }
+
+    /**
+     * @return the recupSelectionner
+     */
+    public boolean isRecupSelectionner() {
+        return recupSelectionner;
+    }
+
+    /**
+     * @param recupSelectionner the recupSelectionner to set
+     */
+    public  void setRecupSelectionner(boolean recupSelectionner) {
+        this.recupSelectionner = recupSelectionner;
+    }
+
+    /**
+     * @return the sauvegardeAchatNonPayez
+     */
+    public static List<Article> getSauvegardeAchatNonPayez() {
+        return sauvegardeAchatNonPayez;
+    }
+
+    /**
+     * @param sauvegardeAchatNonPayez the sauvegardeAchatNonPayez to set
+     */
+    public static void setSauvegardeAchatNonPayez(List<Article> sauvegardeAchatNonPayez) {
+        sauvegardeAchatNonPayez = sauvegardeAchatNonPayez;
     }
 
 }

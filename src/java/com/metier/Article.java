@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.metier;
 
 import java.util.Date;
@@ -14,7 +13,7 @@ import java.util.List;
  * @author Romaric
  */
 public class Article {
-    
+
     private Integer idArticle;
     private Integer idCouleur;
     private String nomproduit;
@@ -22,13 +21,16 @@ public class Article {
     private String marque;
     private String promotion;
     private String reduction;
-    private String  disponibilite;
+    private String disponibilite;
     private Date dateAjout;
     private String codeBarre;
     private String etat;
-  public List<Article> listeArticle;
+    public List<Article> listeArticle;
+    private boolean selectProduit = false;
 
-    public Article(){} 
+    public Article() {
+    }
+
     /**
      * @return the idArticle
      */
@@ -196,9 +198,21 @@ public class Article {
     public void setListeArticle(List<Article> listeArticle) {
         this.listeArticle = listeArticle;
     }
-    
-    
-            
-            
-             
+
+    /**
+     * @return the selectProduit
+     */
+    public boolean isSelectProduit() {
+        return selectProduit;
+    }
+
+    /**
+     * @param selectProduit the selectProduit to set
+     */
+    public void setSelectProduit(boolean selectProduit) {
+        this.selectProduit = selectProduit;
+    }
+
+  
+
 }
