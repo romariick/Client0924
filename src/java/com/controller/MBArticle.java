@@ -22,6 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -210,7 +212,9 @@ public class MBArticle implements Serializable {
 
                     sauvegardeAchatNonPayez = tempAchat;
                     sauvegardeNonPayez = netApayez;
-                    int debug = 0;
+
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Achat avec succès !", "");
+                    FacesContext.getCurrentInstance().addMessage(null, message);
 
                 }
             }
@@ -258,13 +262,12 @@ public class MBArticle implements Serializable {
         sauvegardeAchatNonPayez.clear();
         sauvegardeNonPayez = 0.0;
         netApayez = 0.0;
-        
-        
+
     }
 
     public void initialisationDetailPDF() throws JRException, FileNotFoundException {
         fileNameTemp = "facture.pdf";
- 
+
         try {
             String destFiles = FacesContext.getCurrentInstance().getExternalContext().getRealPath("admin/");
             File pdfFile = new File(destFiles + "/Fichier.pdf");
@@ -276,9 +279,9 @@ public class MBArticle implements Serializable {
         }
 
         HashMap mesParametres = new HashMap();
-        
+
         mesParametres.put("totalEuro", netApayez);
-       
+        mesParametres.put("datefacture", new Date());
 
         List<Article> temps = null;
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(tempAchat);

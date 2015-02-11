@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -61,6 +62,9 @@ public class MBSession implements Serializable {
             ret = "succes";
         } else {
             ret = "authentification";
+             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login ou mot de passe incorrecte !", "");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+
         }
         return ret;
     }
