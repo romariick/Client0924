@@ -133,9 +133,7 @@ public class MBArticle implements Serializable {
     }
 
     public void parserXML(String url, String method) throws Exception {
-
         String str = listerArticle(url, method);
-
         stringToDom(str);
     }
 
@@ -225,10 +223,6 @@ public class MBArticle implements Serializable {
     public void obtenireParCategorie() {
         try {
             parserXMLParCategorie("http://localhost:8080/CaisseApplication-war/webresources/listearticle/obtenirArticleByCategorie/" + idcategorie.toString(), "POST");
-//            lstArticle.clear();
-//            lstArticle = new ArrayList<Article>();
-//            lstArticle = ArticleHandler.getListArctile();
-//            ArticleHandler.getListArctile();
 
         } catch (Exception ex) {
             Logger.getLogger(MBArticle.class.getName()).log(Level.SEVERE, null, ex);
@@ -243,18 +237,8 @@ public class MBArticle implements Serializable {
 
         if (!str.isEmpty()) {
             stringToDom(str);
-//            List<Article> tempList = new ArrayList<Article>();
-//            tempList = ArticleHandler.getListArctile();
-            //int debug = 0;
         }
-//        for(Article recupArticleAcheter : lstArticle){
-//            if(recupArticleAcheter.getSelectProduit()){
-//                System.out.println("True");        
-//            }else{
-//                System.out.println("False");
-//            }
-//        }
-//        
+
     }
 
     public void validerAchat() throws JRException, FileNotFoundException {
